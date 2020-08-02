@@ -98,9 +98,12 @@ def aggregate_data():
                 mood_point_list.append(list(map(lambda x: int(x), row[1:])))
 
     mood_point_sum = [sum(i) for i in zip(*mood_point_list)]
+    total_point = 0
     for k, x in enumerate(mood_point_sum):
         mood_point = 0 if x == 0 else (1 if 1 <= x <=2 else (2 if 3 <= x <= 4 else 3))
         print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点')
+        total_point += mood_point
+    print('合計:' + str(total_point) + '点')
 
     print('\n')
 

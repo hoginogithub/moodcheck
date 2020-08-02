@@ -1,4 +1,5 @@
 import csv
+import datetime
 
 MOOD_MESSAGE = {
     '1': '普段は何でもないことがわずらわしい。',
@@ -23,25 +24,83 @@ MOOD_MESSAGE = {
     '20': '仕事が手につかない。',
 }
 
+DATA_FILE = 'mood_data_file'
+
 REVERSE_QUESTIONS = ['4', '8', '12', '16',]
+
+def is_valid_date(date):
+    try:
+        yyyy = int(date[0:4])
+        mm = int(date[4:6])
+        dd = int(date[6:8])
+        datetime.date(yyyy,mm,dd)
+    except:
+        print('正しい日付を入力してください')
+        return False
+    else:
+        return True
+
+def is_valid_choice(choice):
+    if choice in ['0', '1']:
+        return True
+    else:
+        print('0か1を入力してください')
+        return False
 
 def input_data():
     mood_list = []
-    date = input('入力日(yyyymmdd)')
+    loop = True
+    while loop:
+        date = input('入力日(yyyymmdd)')
+        loop = not(is_valid_date(date))
     mood_list.append(date)
-    print(date)
     for num, msg in MOOD_MESSAGE.items():
-        if num in REVERSE_QUESTIONS:
-            check = int(input(num + ':' + msg + '(はい:0,いいえ:1)'))
-        else:
-            check = int(input(num + ':' + msg + '(はい:1,いいえ:0)'))
-        mood_list.append(check)
+        loop = True
+        while loop:
+            if num in REVERSE_QUESTIONS:
+                choice = input(num + ':' + msg + '(0:はい:,1:いいえ)')
+            else:
+                choice = input(num + ':' + msg + '(1:はい,0:いいえ)')
+            loop = not(is_valid_choice(choice))
+        mood_list.append(int(choice))
     
-    with open('mood_data_file', 'a', encoding='utf-8', newline='') as f:
+    with open(DATA_FILE, 'a', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(mood_list)
     
     print(mood_list[0]+'のデータを登録しました')
+
+    print('\n')
+
+def get_str_date(date, delta_days):
+    yyyy = int(date[0:4])
+    mm = int(date[4:6])
+    dd = int(date[6:8])
+    base_date = datetime.date(yyyy,mm,dd)
+    result_date = base_date - datetime.timedelta(days=delta_days)
+    return result_date.strftime('%Y%m%d')
+
+def aggregate_data():
+    loop = True
+    while loop:
+        date = input('集計基準日(yyyymmdd)')
+        loop = not(is_valid_date(date)) 
+    from_date = get_str_date(date, 7)
+    to_date = get_str_date(date, 0)
+    print('- 集計結果 -')
+    print(from_date + ' - ' + to_date)
+
+    with open(DATA_FILE, encoding='utf-8') as f:
+        reader = csv.reader(f)
+        mood_point_list = []
+        for row in reader:
+            if from_date <= row[0] <= to_date:
+                mood_point_list.append(list(map(lambda x: int(x), row[1:])))
+
+    mood_point_sum = [sum(i) for i in zip(*mood_point_list)]
+    for k, x in enumerate(mood_point_sum):
+        mood_point = 0 if x == 0 else (1 if 1 <= x <=2 else (2 if 3 <= x <= 4 else 3))
+        print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点')
 
     print('\n')
 
@@ -59,6 +118,7 @@ if __name__ == "__main__":
             input_data()
         elif menu_num == '2':
             print('気分チェックを集計します\n')
+            aggregate_data()
         elif menu_num == '9':
             val = False
             print('気分チェックを終了します')

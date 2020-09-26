@@ -53,6 +53,12 @@ def input_data():
     while loop:
         date = input('入力日(yyyymmdd)')
         loop = not(is_valid_date(date))
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if date in row:
+                print(date + 'は、既に登録済みです')
+                return
     mood_list.append(date)
     for num, msg in MOOD_MESSAGE.items():
         loop = True

@@ -113,6 +113,24 @@ def aggregate_data():
 
     print('\n')
 
+def list_one_week():
+    today = datetime.date.today().strftime('%Y%m%d')
+    week_list = []
+    check_list = ['×' for i in range(0, 7)]
+    for i in range(7, 0, -1):
+        week_list.append(get_str_date(today, i))
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            try:
+                check_list[week_list.index(row[0])] = '〇'
+            except:
+                pass
+    for i in range(0, 7):
+        print(week_list[i] + "->" + check_list[i])
+
+    print('\n')
+
 if __name__ == "__main__":
     val = True
     while val == True:
@@ -120,6 +138,7 @@ if __name__ == "__main__":
         print('メニューを選んでください')
         print('1:データ入力')
         print('2:集計')
+        print('5:過去7日間の入力状況')
         print('9:終了')
         menu_num = input()
         if menu_num == '1':
@@ -128,6 +147,8 @@ if __name__ == "__main__":
         elif menu_num == '2':
             print('気分チェックを集計します\n')
             aggregate_data()
+        elif menu_num == '5':
+            list_one_week()
         elif menu_num == '9':
             val = False
             print('気分チェックを終了します')

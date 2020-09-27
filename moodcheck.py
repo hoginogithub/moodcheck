@@ -55,6 +55,14 @@ def get_str_date(date, delta_days):
     result_date = base_date - datetime.timedelta(days=delta_days)
     return result_date.strftime('%Y%m%d')
 
+def is_data_exist(date):
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if date in row:
+                return True
+    return False
+
 def input_data():
     print('データ入力を開始します\n')
     mood_list = []
@@ -62,12 +70,9 @@ def input_data():
     while loop:
         date = input('入力日(yyyymmdd)')
         loop = not(is_valid_date(date))
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if date in row:
-                print(date + 'は、既に登録済みです')
-                return
+    if is_data_exist(date):
+        print(date + 'は、既に登録済みです')
+        return
     mood_list.append(date)
     for num, msg in MOOD_MESSAGE.items():
         loop = True
@@ -115,6 +120,32 @@ def aggregate_data():
 
     print('\n')
 
+def delete_data():
+    print('削除したいデータを指定してください\n')
+    loop = True
+    while loop:
+        date = input('削除対象日(yyyymmdd)')
+        loop = not(is_valid_date(date))
+    if not(is_data_exist(date)):
+        print('指定された日付のデータは存在しませんでした\n')
+        return
+    ret = input(date + 'のデータを削除してよろしいですか?(y,n)')
+    if not(ret == 'y'):
+        return
+    data_list = []
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not(date in row):
+                data_list.append(row)
+    with open(DATA_FILE, 'r+') as f:
+        f.truncate(0)
+    with open(DATA_FILE, 'a', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f)
+        for data in data_list:
+            writer.writerow(data)
+    print(date + 'のデータを削除しました\n')
+
 def display_data():
     print('照会したい日付を入力してください\n')
     loop = True
@@ -161,6 +192,7 @@ if __name__ == "__main__":
         print('メニューを選んでください')
         print('1:データ入力')
         print('2:集計')
+        print('3:データ削除')
         print('4:データ照会')
         print('5:過去7日間の入力状況')
         print('9:終了')
@@ -169,6 +201,8 @@ if __name__ == "__main__":
             input_data()
         elif menu_num == '2':
             aggregate_data()
+        elif menu_num == '3':
+            delete_data()
         elif menu_num == '4':
             display_data()
         elif menu_num == '5':

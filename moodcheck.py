@@ -47,7 +47,16 @@ def is_valid_choice(choice):
         print('0か1を入力してください')
         return False
 
+def get_str_date(date, delta_days):
+    yyyy = int(date[0:4])
+    mm = int(date[4:6])
+    dd = int(date[6:8])
+    base_date = datetime.date(yyyy,mm,dd)
+    result_date = base_date - datetime.timedelta(days=delta_days)
+    return result_date.strftime('%Y%m%d')
+
 def input_data():
+    print('データ入力を開始します\n')
     mood_list = []
     loop = True
     while loop:
@@ -78,15 +87,8 @@ def input_data():
 
     print('\n')
 
-def get_str_date(date, delta_days):
-    yyyy = int(date[0:4])
-    mm = int(date[4:6])
-    dd = int(date[6:8])
-    base_date = datetime.date(yyyy,mm,dd)
-    result_date = base_date - datetime.timedelta(days=delta_days)
-    return result_date.strftime('%Y%m%d')
-
 def aggregate_data():
+    print('気分チェックを集計します\n')
     loop = True
     while loop:
         date = input('集計基準日(yyyymmdd)')
@@ -110,6 +112,27 @@ def aggregate_data():
         print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点')
         total_point += mood_point
     print('合計:' + str(total_point) + '点')
+
+    print('\n')
+
+def display_data():
+    print('照会したい日付を入力してください\n')
+    loop = True
+    while loop:
+        date = input('入力日(yyyymmdd)')
+        loop = not(is_valid_date(date))
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if date in row:
+                for num, msg in MOOD_MESSAGE.items():
+                    if num in REVERSE_QUESTIONS:
+                        print(num + ':' + msg + '(0:はい:,1:いいえ)'+ row[int(num)])
+                    else:
+                        print(num + ':' + msg + '(1:はい,0:いいえ)'+ row[int(num)])
+                print('\n')
+                return
+    print('該当する日付のデータは入力されていません')
 
     print('\n')
 
@@ -138,15 +161,16 @@ if __name__ == "__main__":
         print('メニューを選んでください')
         print('1:データ入力')
         print('2:集計')
+        print('4:データ照会')
         print('5:過去7日間の入力状況')
         print('9:終了')
         menu_num = input()
         if menu_num == '1':
-            print('データ入力を開始します\n')
             input_data()
         elif menu_num == '2':
-            print('気分チェックを集計します\n')
             aggregate_data()
+        elif menu_num == '4':
+            display_data()
         elif menu_num == '5':
             list_one_week()
         elif menu_num == '9':

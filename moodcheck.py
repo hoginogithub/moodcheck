@@ -55,6 +55,25 @@ def get_str_date(date, delta_days):
     result_date = base_date - datetime.timedelta(days=delta_days)
     return result_date.strftime('%Y%m%d')
 
+def get_mood_point_sum(from_date, to_date):
+    with open(DATA_FILE, encoding='utf-8') as f:
+        reader = csv.reader(f)
+        mood_point_list = []
+        for row in reader:
+            if from_date <= row[0] <= to_date:
+                mood_point_list.append(list(map(lambda x: int(x), row[1:])))
+
+    return [sum(i) for i in zip(*mood_point_list)]
+
+def get_mood_point(count):
+    if count == 0:
+        return 0
+    if 1 <= count <=2:
+        return 1
+    if 3 <= count <= 4: 
+        return 2
+    return 3
+
 def is_data_exist(date):
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -100,21 +119,19 @@ def aggregate_data():
         loop = not(is_valid_date(date)) 
     from_date = get_str_date(date, 7)
     to_date = get_str_date(date, 0)
+    before_from_date = get_str_date(date, 14)
+    before_to_date = get_str_date(date, 8)
     print('- 集計結果 -')
     print(from_date + ' - ' + to_date)
 
-    with open(DATA_FILE, encoding='utf-8') as f:
-        reader = csv.reader(f)
-        mood_point_list = []
-        for row in reader:
-            if from_date <= row[0] <= to_date:
-                mood_point_list.append(list(map(lambda x: int(x), row[1:])))
-
-    mood_point_sum = [sum(i) for i in zip(*mood_point_list)]
+    mood_point_sum = get_mood_point_sum(from_date, to_date)
+    before_point_sum = get_mood_point_sum(before_from_date, before_to_date)
     total_point = 0
-    for k, x in enumerate(mood_point_sum):
-        mood_point = 0 if x == 0 else (1 if 1 <= x <=2 else (2 if 3 <= x <= 4 else 3))
-        print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点')
+    for k, x, y in enumerate(mood_point_sum, before_point_sum):
+        mood_point = get_mood_point(x)
+        before_mood_point = get_mood_point(y)
+        str_diff_point = f' ({x - y:+})'
+        print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点' + str_diff_point)
         total_point += mood_point
     print('合計:' + str(total_point) + '点')
 

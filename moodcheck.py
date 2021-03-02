@@ -127,13 +127,16 @@ def aggregate_data():
     mood_point_sum = get_mood_point_sum(from_date, to_date)
     before_point_sum = get_mood_point_sum(before_from_date, before_to_date)
     total_point = 0
-    for k, x, y in enumerate(mood_point_sum, before_point_sum):
-        mood_point = get_mood_point(x)
-        before_mood_point = get_mood_point(y)
-        str_diff_point = f' ({x - y:+})'
+    before_total_point = 0
+    for k, x in enumerate(list(zip(mood_point_sum, before_point_sum))):
+        mood_point = get_mood_point(x[0])
+        before_mood_point = get_mood_point(x[1])
+        str_diff_point = f' ({x[0] - x[1]:+})'
         print(str(k+1) + ':' + MOOD_MESSAGE[str(k+1)] + '=' + str(mood_point) + '点' + str_diff_point)
         total_point += mood_point
-    print('合計:' + str(total_point) + '点')
+        before_total_point += before_mood_point
+    str_diff_total_point = f' ({total_point - before_total_point:+})'
+    print('合計:' + str(total_point) + '点'+ str_diff_total_point)
 
     print('\n')
 

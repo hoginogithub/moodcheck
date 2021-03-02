@@ -55,6 +55,13 @@ def get_str_date(date, delta_days):
     result_date = base_date - datetime.timedelta(days=delta_days)
     return result_date.strftime('%Y%m%d')
 
+def get_str_today():
+    return datetime.date.today().strftime('%Y%m%d')
+
+def get_str_yesterday():
+    str_today = datetime.date.today().strftime('%Y%m%d')
+    return get_str_date(str_today, 1)
+
 def get_mood_point_sum(from_date, to_date):
     with open(DATA_FILE, encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -115,12 +122,16 @@ def aggregate_data():
     print('気分チェックを集計します\n')
     loop = True
     while loop:
-        date = input('集計基準日(yyyymmdd)')
+        yesterday = get_str_yesterday()
+        date = input(f'集計基準日(yyyymmdd or default=昨日:0)')
+        if date == '0':
+            date = yesterday
         loop = not(is_valid_date(date)) 
     from_date = get_str_date(date, 6)
     to_date = get_str_date(date, 0)
     before_from_date = get_str_date(date, 13)
     before_to_date = get_str_date(date, 7)
+
     print('- 集計結果 -')
     print(from_date + ' - ' + to_date)
 
@@ -137,7 +148,8 @@ def aggregate_data():
         before_total_point += before_mood_point
     str_diff_total_point = f' ({total_point - before_total_point:+})'
     print('合計:' + str(total_point) + '点'+ str_diff_total_point)
-    print('\n')
+    input('input any buttun')
+    print('')
 
 def delete_data():
     print('削除したいデータを指定してください\n')
@@ -207,7 +219,8 @@ def list_one_week():
 if __name__ == "__main__":
     val = True
     while val == True:
-        print('== 気分チェック ==')
+        print('== 気分チェック (ver 1.2)==')
+        print(f'本日は{get_str_today()}')
         print('メニューを選んでください')
         print('1:データ入力')
         print('2:集計')

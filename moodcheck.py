@@ -117,10 +117,10 @@ def aggregate_data():
     while loop:
         date = input('集計基準日(yyyymmdd)')
         loop = not(is_valid_date(date)) 
-    from_date = get_str_date(date, 7)
+    from_date = get_str_date(date, 6)
     to_date = get_str_date(date, 0)
-    before_from_date = get_str_date(date, 14)
-    before_to_date = get_str_date(date, 8)
+    before_from_date = get_str_date(date, 13)
+    before_to_date = get_str_date(date, 7)
     print('- 集計結果 -')
     print(from_date + ' - ' + to_date)
 
@@ -137,7 +137,6 @@ def aggregate_data():
         before_total_point += before_mood_point
     str_diff_total_point = f' ({total_point - before_total_point:+})'
     print('合計:' + str(total_point) + '点'+ str_diff_total_point)
-
     print('\n')
 
 def delete_data():

@@ -135,18 +135,10 @@ def aggregate_data():
     print('- 集計結果 -')
     print(from_date + ' - ' + to_date)
 
-    #debug
-    print(f'current week:{from_date} - {to_date}')
-    print(f'before week:{before_from_date} - {before_to_date}')
-
     mood_point_sum = get_mood_point_sum(from_date, to_date)
     before_point_sum = get_mood_point_sum(before_from_date, before_to_date)
     total_point = 0
     before_total_point = 0
-
-    #debug
-    print(f'{mood_point_sum=}')
-    print(f'{before_point_sum=}')
 
     for k, x in enumerate(list(zip(mood_point_sum, before_point_sum))):
         mood_point = get_mood_point(x[0])

@@ -69,6 +69,14 @@ def interpret_date(date):
     finally:
         return date
 
+def get_input_date(message_prefix='入力日'):
+    loop = True
+    while loop:
+        date = input(message_prefix + '(yyyymmdd or 今日:0, 昨日:1)')
+        date = interpret_date(date)
+        loop = not(is_valid_date(date))
+    return date
+
 def get_mood_point_sum(from_date, to_date):
     with open(DATA_FILE, encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -99,11 +107,7 @@ def is_data_exist(date):
 def input_data():
     print('データ入力を開始します\n')
     mood_list = []
-    loop = True
-    while loop:
-        date = input('入力日(yyyymmdd or 今日:0, 昨日:1)')
-        date = interpret_date(date)
-        loop = not(is_valid_date(date))
+    date = get_input_date()
     if is_data_exist(date):
         print(date + 'は、既に登録済みです')
         return
@@ -128,11 +132,7 @@ def input_data():
 
 def aggregate_data():
     print('気分チェックを集計します\n')
-    loop = True
-    while loop:
-        date = input(f'集計基準日(yyyymmdd or 今日:0, 昨日:1)')
-        date = interpret_date(date)
-        loop = not(is_valid_date(date)) 
+    date = get_input_date(message_prefix='集計基準日')
     from_date = get_str_date(date, 6)
     to_date = get_str_date(date, 0)
     before_from_date = get_str_date(date, 13)
@@ -160,11 +160,7 @@ def aggregate_data():
 
 def delete_data():
     print('削除したいデータを指定してください\n')
-    loop = True
-    while loop:
-        date = input('削除対象日(yyyymmdd or 今日:0, 昨日:1)')
-        date = interpret_date(date)
-        loop = not(is_valid_date(date))
+    date = get_input_date(message_prefix='削除対象日')
     if not(is_data_exist(date)):
         print('指定された日付のデータは存在しませんでした\n')
         return
@@ -187,10 +183,7 @@ def delete_data():
 
 def display_data():
     print('照会したい日付を入力してください\n')
-    loop = True
-    while loop:
-        date = input('入力日(yyyymmdd or 今日:0, 昨日:1)')
-        loop = not(is_valid_date(date))
+    date = get_input_date()
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:

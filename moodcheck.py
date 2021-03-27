@@ -62,6 +62,13 @@ def get_str_yesterday():
     str_today = datetime.date.today().strftime('%Y%m%d')
     return get_str_date(str_today, 1)
 
+def interpret_date(date):
+    dict_date = {'0': get_str_today(), '1': get_str_yesterday()}
+    try:
+        date = dict_date[date]
+    finally:
+        return date
+
 def get_mood_point_sum(from_date, to_date):
     with open(DATA_FILE, encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -94,7 +101,8 @@ def input_data():
     mood_list = []
     loop = True
     while loop:
-        date = input('入力日(yyyymmdd)')
+        date = input('入力日(yyyymmdd or 今日:0, 昨日:1)')
+        date = interpret_date(date)
         loop = not(is_valid_date(date))
     if is_data_exist(date):
         print(date + 'は、既に登録済みです')
@@ -122,10 +130,8 @@ def aggregate_data():
     print('気分チェックを集計します\n')
     loop = True
     while loop:
-        yesterday = get_str_yesterday()
-        date = input(f'集計基準日(yyyymmdd or default=昨日:0)')
-        if date == '0':
-            date = yesterday
+        date = input(f'集計基準日(yyyymmdd or 今日:0, 昨日:1)')
+        date = interpret_date(date)
         loop = not(is_valid_date(date)) 
     from_date = get_str_date(date, 6)
     to_date = get_str_date(date, 0)
@@ -156,7 +162,8 @@ def delete_data():
     print('削除したいデータを指定してください\n')
     loop = True
     while loop:
-        date = input('削除対象日(yyyymmdd)')
+        date = input('削除対象日(yyyymmdd or 今日:0, 昨日:1)')
+        date = interpret_date(date)
         loop = not(is_valid_date(date))
     if not(is_data_exist(date)):
         print('指定された日付のデータは存在しませんでした\n')
@@ -182,7 +189,7 @@ def display_data():
     print('照会したい日付を入力してください\n')
     loop = True
     while loop:
-        date = input('入力日(yyyymmdd)')
+        date = input('入力日(yyyymmdd or 今日:0, 昨日:1)')
         loop = not(is_valid_date(date))
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -220,7 +227,7 @@ def list_one_week():
 if __name__ == "__main__":
     val = True
     while val == True:
-        print('== 気分チェック (ver 1.2)==')
+        print('== 気分チェック (ver 1.3)==')
         print(f'本日は{get_str_today()}')
         print('メニューを選んでください')
         print('1:データ入力')

@@ -200,11 +200,11 @@ def display_data():
     print('\n')
 
 def list_one_week():
-    today = datetime.date.today().strftime('%Y%m%d')
+    date = get_input_date(message_prefix='指定日')
     week_list = []
     check_list = ['×' for i in range(0, 7)]
     for i in range(7, 0, -1):
-        week_list.append(get_str_date(today, i))
+        week_list.append(get_str_date(date, i))
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:
@@ -220,14 +220,14 @@ def list_one_week():
 if __name__ == "__main__":
     val = True
     while val == True:
-        print('== 気分チェック (ver 1.3)==')
+        print('== 気分チェック (ver 1.4)==')
         print(f'本日は{get_str_today()}')
         print('メニューを選んでください')
         print('1:データ入力')
         print('2:集計')
         print('3:データ削除')
         print('4:データ照会')
-        print('5:過去7日間の入力状況')
+        print('5:指定日から過去7日間の入力状況')
         print('9:終了')
         menu_num = input()
         if menu_num == '1':
